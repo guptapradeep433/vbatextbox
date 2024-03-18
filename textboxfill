@@ -1,0 +1,55 @@
+Sub CopyDataFromExcelToPowerPoint()
+    Dim pptApp As Object
+    Dim pptPres As Object
+    Dim pptSlide As Object
+    Dim excelApp As Object
+    Dim excelWB As Object
+    Dim excelSheet As Object
+    Dim i As Integer
+    Dim rowOffset As Integer
+    
+    ' Open PowerPoint
+    Set pptApp = CreateObject("PowerPoint.Application")
+    pptApp.Visible = True
+    
+    ' Open Excel
+    Set excelApp = CreateObject("Excel.Application")
+    Set excelWB = excelApp.Workbooks.Open("C:\Users\Pradeep\Downloads\we1.xlsx")
+    Set excelSheet = excelWB.Sheets("Sheet1") ' Change the sheet name if necessary
+    
+    ' Reference the active presentation in PowerPoint
+    Set pptPres = pptApp.ActivePresentation
+    
+    ' Reference the slide where you want to paste the data
+    Set pptSlide = pptPres.Slides(1) ' Change slide number if necessary
+    
+    ' Loop through the first 12 text boxes and paste data from Excel
+    rowOffset = 0 ' Initialize row offset
+    For i = 1 To 6
+        With pptSlide.Shapes("TextBox " & i).TextFrame.textRange
+            .Text = excelSheet.Cells(1 + rowOffset, 1).Value & vbCrLf & _
+                    excelSheet.Cells(1 + rowOffset, 2).Value & vbCrLf & _
+                    excelSheet.Cells(1 + rowOffset, 3).Value
+            
+            ' Format the text
+            .Characters(1, Len(excelSheet.Cells(1 + rowOffset, 1).Value)).Font.Bold = True ' Make column 1 bold
+            .Characters(Len(excelSheet.Cells(1 + rowOffset, 1).Value) + 2, Len(excelSheet.Cells(1 + rowOffset, 2).Value)).Font.Italic = True ' Make column 2 italic
+        End With
+        
+        rowOffset = rowOffset + 1 ' Move to the next row in Excel
+    Next i
+    
+    ' Close Excel without saving changes
+    excelWB.Close False
+    excelApp.Quit
+    
+    ' Clean up
+    Set pptSlide = Nothing
+    Set pptPres = Nothing
+    Set pptApp = Nothing
+    Set excelSheet = Nothing
+    Set excelWB = Nothing
+    Set excelApp = Nothing
+End Sub
+
+
